@@ -5,9 +5,16 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 
 export default function Home() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const router = useRouter();
   const [darkMode, setDarkMode] = useState(false);
+
+  // Redirect authenticated users straight to the dashboard
+  useEffect(() => {
+    if (status === "authenticated") {
+      router.replace("/dashboard");
+    }
+  }, [status, router]);
 
   // Initialize theme based on preference or default to light
   useEffect(() => {
@@ -57,9 +64,11 @@ export default function Home() {
               <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-cyan-500 flex items-center justify-center shadow-lg shadow-blue-500/20">
                 <span className="font-bold text-white">F</span>
               </div>
-              <span className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">FinPay</span>
+              <span className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">
+                FinPay
+              </span>
             </div>
-            
+
             <div className="flex items-center gap-4">
               {/* Theme Toggle */}
               <button
@@ -68,12 +77,32 @@ export default function Home() {
                 aria-label="Toggle Theme"
               >
                 {darkMode ? (
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
+                    />
                   </svg>
                 ) : (
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+                    />
                   </svg>
                 )}
               </button>
@@ -131,7 +160,11 @@ export default function Home() {
                   >
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 dark:via-black/10 to-transparent translate-x-[-100%] group-hover:animate-shimmer" />
                     <span className="relative flex items-center justify-center gap-3">
-                     <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                      <svg
+                        className="w-5 h-5"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                      >
                         <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
                         <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
                         <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
@@ -229,35 +262,7 @@ export default function Home() {
                 ))}
               </div>
             </div>
-          ) : (
-            // Logged In Dashboard Placeholder
-            <div className="min-h-[80vh] flex flex-col items-center justify-center text-center px-4">
-                 <div className="mb-12">
-                <div className="mb-6 flex justify-center">
-                  {session.user?.image && (
-                    <Image
-                      src={session.user.image}
-                      alt={session.user.name || "User"}
-                      width={100}
-                      height={100}
-                      className="rounded-full border-4 border-white/10 shadow-2xl"
-                    />
-                  )}
-                </div>
-                <h2 className="text-5xl font-bold text-slate-900 dark:text-white mb-4">Welcome back, <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-500">{session.user?.name?.split(' ')[0]}</span></h2>
-                <p className="text-xl text-slate-600 dark:text-gray-400">Your finances are looking good today.</p>
-              </div>
-
-              <div className="bg-white/50 dark:bg-white/5 backdrop-blur-xl rounded-2xl border border-gray-200 dark:border-white/10 p-10 max-w-md w-full">
-                <button
-                  onClick={() => router.push("/dashboard")}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-xl transition-all shadow-lg hover:shadow-blue-500/25"
-                >
-                  Go to Dashboard
-                </button>
-              </div>
-            </div>
-          )}
+          ) : null}
         </div>
       </main>
     </>
